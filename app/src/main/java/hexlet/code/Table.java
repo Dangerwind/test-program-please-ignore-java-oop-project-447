@@ -24,14 +24,14 @@ public final class Table {
   }
 
   public Insert insert() {
-    throw new UnsupportedOperationException();
+    return new Insert(dialect, schema, name);
   }
 
   public Update update() {
-    throw new UnsupportedOperationException();
+    return new Update(dialect, schema, name);
   }
 
   public Delete delete() {
-    throw new UnsupportedOperationException();
+    return new Delete(dialect, schema, name);
   }
 }

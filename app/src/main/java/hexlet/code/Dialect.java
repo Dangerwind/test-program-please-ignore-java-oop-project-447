@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Диалект SQL: знает, как запрос выглядит в конкретной базе данных.
@@ -18,6 +19,23 @@ public interface Dialect {
    * @param columns колонки; пустой список означает «все колонки»
    */
   void formatSelect(SqlWriter writer, String table, List<String> columns);
+
+  /**
+   * Печатает начало вставки: таблицу, колонки и их значения.
+   *
+   * @param values колонки и значения в порядке вызовов
+   */
+  void formatInsert(SqlWriter writer, String table, Map<String, Object> values);
+
+  /**
+   * Печатает начало обновления: таблицу и присваивания.
+   *
+   * @param values колонки и значения в порядке вызовов
+   */
+  void formatUpdate(SqlWriter writer, String table, Map<String, Object> values);
+
+  /** Печатает начало удаления: только имя таблицы. */
+  void formatDelete(SqlWriter writer, String table);
 
   /**
    * Оборачивает имя таблицы или колонки в кавычки диалекта.

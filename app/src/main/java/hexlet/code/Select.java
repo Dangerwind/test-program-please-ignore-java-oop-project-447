@@ -20,13 +20,13 @@ public final class Select {
   private final Schema schema;
   private final String table;
   private final List<String> columns;
-  private final List<Condition> conditions;
+  private final Where where;
   private final List<String> orderBy;
   private final Integer limit;
   private final Integer offset;
 
   Select(Dialect dialect, Schema schema, String table, List<String> columns) {
-    this(dialect, schema, table, columns, List.of(), List.of(), null, null);
+    this(dialect, schema, table, columns, Where.empty(), List.of(), null, null);
   }
 
   private Select(
@@ -34,7 +34,7 @@ public final class Select {
       Schema schema,
       String table,
       List<String> columns,
-      List<Condition> conditions,
+      Where where,
       List<String> orderBy,
       Integer limit,
       Integer offset) {
@@ -42,7 +42,7 @@ public final class Select {
     this.schema = schema;
     this.table = table;
     this.columns = List.copyOf(columns);
-    this.conditions = List.copyOf(conditions);
+    this.where = where;
     this.orderBy = List.copyOf(orderBy);
     this.limit = limit;
     this.offset = offset;
@@ -55,7 +55,7 @@ public final class Select {
         schema,
         table,
         columns,
-        appended(conditions, Objects.requireNonNull(condition)),
+        where.and(Objects.requireNonNull(condition)),
         orderBy,
         limit,
         offset);
@@ -68,7 +68,7 @@ public final class Select {
         schema,
         table,
         columns,
-        conditions,
+        where,
         appended(orderBy, Objects.requireNonNull(column)),
         limit,
         offset);
@@ -77,13 +77,13 @@ public final class Select {
   /** Ограничивает число строк. Повторный вызов заменяет прежнее значение. */
   public Select limit(int count) {
     requireNonNegative(count, "LIMIT");
-    return new Select(dialect, schema, table, columns, conditions, orderBy, count, offset);
+    return new Select(dialect, schema, table, columns, where, orderBy, count, offset);
   }
 
   /** Пропускает строки перед результатом. Повторный вызов заменяет прежнее значение. */
   public Select offset(int count) {
     requireNonNegative(count, "OFFSET");
-    return new Select(dialect, schema, table, columns, conditions, orderBy, limit, count);
+    return new Select(dialect, schema, table, columns, where, orderBy, limit, count);
   }
 
   /** Печатает запрос диалектом, проверяя имена по схеме. */
@@ -95,15 +95,7 @@ public final class Select {
 
     var writer = new SqlWriter(dialect, schema, table);
     dialect.formatSelect(writer, table, columns);
-
-    if (conditions.size() == 1) {
-      // Одиночное условие печатаем как есть: AND вокруг него поставил бы лишние скобки.
-      writer.sql(" WHERE ");
-      conditions.getFirst().render(writer);
-    } else if (conditions.size() > 1) {
-      writer.sql(" WHERE ");
-      new AndCondition(conditions).render(writer);
-    }
+    where.render(writer);
 
     if (!orderBy.isEmpty()) {
       writer.sql(" ORDER BY ");
