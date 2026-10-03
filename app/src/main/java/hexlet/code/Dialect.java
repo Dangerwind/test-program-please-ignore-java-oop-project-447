@@ -50,6 +50,28 @@ public interface Dialect {
   void formatDelete(SqlWriter writer, String table);
 
   /**
+   * Печатает условие запроса вместе со словом WHERE. Без условий ничего не печатает.
+   *
+   * @param conditions условия в порядке вызовов
+   */
+  void formatWhere(SqlWriter writer, List<Condition> conditions);
+
+  /**
+   * Печатает сортировку вместе со словами ORDER BY. Без колонок ничего не печатает.
+   *
+   * @param columns колонки в порядке вызовов
+   */
+  void formatOrderBy(SqlWriter writer, List<String> columns);
+
+  /**
+   * Печатает страницу результата: LIMIT и OFFSET, каждый только если он задан.
+   *
+   * @param limit сколько строк вернуть, либо {@code null}
+   * @param offset сколько строк пропустить, либо {@code null}
+   */
+  void formatLimit(SqlWriter writer, Integer limit, Integer offset);
+
+  /**
    * Оборачивает имя таблицы или колонки в кавычки диалекта.
    *
    * <p>Без кавычек база читает имя вроде {@code order} как ключевое слово и отказывается выполнять

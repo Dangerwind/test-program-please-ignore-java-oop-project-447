@@ -64,7 +64,7 @@ public final class Update {
     }
     var writer = new SqlWriter(dialect, schema, table);
     dialect.formatUpdate(writer, table, values);
-    where.render(writer);
+    dialect.formatWhere(writer, where.conditions());
     return writer.compiled();
   }
 }

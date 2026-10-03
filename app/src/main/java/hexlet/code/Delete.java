@@ -41,7 +41,7 @@ public final class Delete {
     }
     var writer = new SqlWriter(dialect, schema, table);
     dialect.formatDelete(writer, table);
-    where.render(writer);
+    dialect.formatWhere(writer, where.conditions());
     return writer.compiled();
   }
 }

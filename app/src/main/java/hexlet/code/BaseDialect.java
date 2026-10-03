@@ -6,9 +6,13 @@ import java.util.Map;
 /**
  * Стандартный SQL: имена в двойных кавычках, на месте значения знак {@code ?}.
  *
- * <p>Здесь живёт общая раскладка запросов: их порядок, запятые, пробелы. Подкласс меняет только
- * отдельные шаги — {@link #quoteChar()} и {@link #formatUpsert} — и не трогает раскладку целиком.
- * Иначе правку пришлось бы повторять в каждом диалекте.
+ * <p>Здесь живёт вся печать запросов: их порядок, запятые, пробелы, скобки условий, {@code ORDER
+ * BY}, {@code LIMIT} и {@code OFFSET}. Модель запроса про SQL не знает — она только хранит, что
+ * выбрано и какие условия заданы, и отдаёт это сюда.
+ *
+ * <p>Подкласс меняет отдельные шаги — {@link #quoteChar()}, {@link #placeholderText(int)} и {@link
+ * #formatUpsert} — и не трогает раскладку целиком. Иначе правку пришлось бы повторять в каждом
+ * диалекте.
  *
  * <p>Раскладка помечена {@code final}: подкласс сможет подменить шаг, но не всю печать, поэтому все
  * диалекты остаются одинаковыми в том, что не различается.
@@ -65,6 +69,44 @@ public class BaseDialect implements Dialect {
   @Override
   public final void formatDelete(SqlWriter writer, String table) {
     writer.sql("DELETE FROM ").table(table);
+  }
+
+  /**
+   * Печатает условие вместе со словом WHERE.
+   *
+   * <p>Одиночное условие печатается как есть: AND вокруг него поставил бы лишние скобки. Несколько
+   * условий соединяются через AND, а вложенный OR берётся в скобки.
+   */
+  @Override
+  public final void formatWhere(SqlWriter writer, List<Condition> conditions) {
+    if (conditions.isEmpty()) {
+      return;
+    }
+    writer.sql(" WHERE ");
+    if (conditions.size() == 1) {
+      conditions.getFirst().render(writer);
+    } else {
+      new AndCondition(conditions).render(writer);
+    }
+  }
+
+  @Override
+  public final void formatOrderBy(SqlWriter writer, List<String> columns) {
+    if (columns.isEmpty()) {
+      return;
+    }
+    writer.sql(" ORDER BY ");
+    printColumns(writer, columns);
+  }
+
+  @Override
+  public final void formatLimit(SqlWriter writer, Integer limit, Integer offset) {
+    if (limit != null) {
+      writer.sql(" LIMIT " + limit);
+    }
+    if (offset != null) {
+      writer.sql(" OFFSET " + offset);
+    }
   }
 
   /**

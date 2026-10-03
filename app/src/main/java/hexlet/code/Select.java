@@ -95,25 +95,9 @@ public final class Select {
 
     var writer = new SqlWriter(dialect, schema, table);
     dialect.formatSelect(writer, table, columns);
-    where.render(writer);
-
-    if (!orderBy.isEmpty()) {
-      writer.sql(" ORDER BY ");
-      for (var i = 0; i < orderBy.size(); i++) {
-        if (i > 0) {
-          writer.sql(", ");
-        }
-        writer.column(orderBy.get(i));
-      }
-    }
-
-    if (limit != null) {
-      writer.sql(" LIMIT " + limit);
-    }
-    if (offset != null) {
-      writer.sql(" OFFSET " + offset);
-    }
-
+    dialect.formatWhere(writer, where.conditions());
+    dialect.formatOrderBy(writer, orderBy);
+    dialect.formatLimit(writer, limit, offset);
     return writer.compiled();
   }
 
