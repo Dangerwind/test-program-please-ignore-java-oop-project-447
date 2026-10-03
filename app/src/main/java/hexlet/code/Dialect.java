@@ -28,6 +28,18 @@ public interface Dialect {
   void formatInsert(SqlWriter writer, String table, Map<String, Object> values);
 
   /**
+   * Печатает хвост вставки с разрешением конфликта, то есть upsert.
+   *
+   * <p>Диалекты договорились по-разному: PostgreSQL называет колонки конфликта, а MySQL находит
+   * нарушенный уникальный ключ сам и колонки не печатает. Поэтому аргумент {@code conflictColumns}
+   * MySQL игнорирует.
+   *
+   * @param conflictColumns колонки уникального ключа в порядке вызовов
+   * @param updateColumns колонки, которым достаются значения из вставляемой строки
+   */
+  void formatUpsert(SqlWriter writer, List<String> conflictColumns, List<String> updateColumns);
+
+  /**
    * Печатает начало обновления: таблицу и присваивания.
    *
    * @param values колонки и значения в порядке вызовов
