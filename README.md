@@ -7,7 +7,6 @@
 
 Учебный проект Хекслета: https://ru.hexlet.io/programs/test-program-please-ignore-java-oop
 
-
 ## Стек
 
 - Java 25
@@ -17,7 +16,8 @@
 
 ## Установка
 
-Нужен JDK 25 и Gradle 9.1+.
+Нужны только `git` и `make` (на macOS `make` ставится через `xcode-select --install`). Gradle
+скачается через wrapper, а JDK 25 подтянется автоматически.
 
 ```bash
 git clone https://github.com/Dangerwind/test-program-please-ignore-java-oop-project-447.git
@@ -38,21 +38,16 @@ make lint     # проверка форматирования (Spotless)
 make lint-fix # отформатировать код автоматически
 ```
 
+Свои тесты лежат в `app/src/test/java/hexlet/code`. Тесты Хекслета запускаются на
+каждый коммит: за это отвечает файл `.github/workflows/hexlet-check.yml` — не удаляйте
+и не переименовывайте ни его, ни репозиторий.
+
 Сборке не нужно настраивать JDK вручную. Компилятор берёт JDK 25 из
 toolchain в `app/build.gradle.kts`, а сам Gradle запускается на JDK 25
 благодаря `app/gradle/gradle-daemon-jvm.properties`. Если нужной версии
 нет, Gradle скачает её сам. Это важно и для линтера: google-java-format
 обращается к внутреннему API javac, поэтому версия форматтера должна
 поддерживать ту JDK, на которой работает Gradle.
-
----
-
-<details>
-<summary>Автоматические тесты Хекслета</summary>
-
-Тесты запускаются на каждый коммит. За запуск отвечает файл `.github/workflows/hexlet-check.yml` — не удаляйте и не переименовывайте ни его, ни репозиторий.
-
-</details>
 
 ## О Хекслете
 

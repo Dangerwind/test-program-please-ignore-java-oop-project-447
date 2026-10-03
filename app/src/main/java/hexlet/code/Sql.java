@@ -1,15 +1,25 @@
 package hexlet.code;
 
+import java.util.Objects;
+
 /** Точка входа в библиотеку: связывает диалект со схемой и открывает таблицы. */
 public final class Sql {
 
-  private Sql() {}
+  private final Dialect dialect;
+  private final Schema schema;
 
-  public static Sql using(Dialect dialect, Schema schema) {
-    throw new UnsupportedOperationException();
+  private Sql(Dialect dialect, Schema schema) {
+    this.dialect = dialect;
+    this.schema = schema;
   }
 
+  /** Создаёт запросы для схемы в диалекте. */
+  public static Sql using(Dialect dialect, Schema schema) {
+    return new Sql(Objects.requireNonNull(dialect), Objects.requireNonNull(schema));
+  }
+
+  /** Открывает таблицу для запросов. */
   public Table table(String name) {
-    throw new UnsupportedOperationException();
+    return new Table(dialect, schema, Objects.requireNonNull(name));
   }
 }
