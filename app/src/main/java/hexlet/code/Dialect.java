@@ -11,13 +11,13 @@ import java.util.List;
 public interface Dialect {
 
   /**
-   * Печатает выборку из таблицы.
+   * Печатает начало запроса: что выбрать и откуда.
    *
+   * @param writer писатель, в который пишется текст запроса и значения
    * @param table таблица, из которой выбираем
    * @param columns колонки; пустой список означает «все колонки»
-   * @return готовый запрос, значений в нём пока нет
    */
-  CompiledQuery formatSelect(String table, List<String> columns);
+  void formatSelect(SqlWriter writer, String table, List<String> columns);
 
   /**
    * Оборачивает имя таблицы или колонки в кавычки диалекта.
